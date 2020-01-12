@@ -8,8 +8,11 @@
       $dotenv->load();
       //echo getenv('WHATS_THE_WEATHER_API_KEY');
       //var_dump($dotenv);
-      //echo getenv($WHATS_THE_WEATHER_API_KEY);
-      $url = "http://api.openweathermap.org/data/2.5/weather?q=".urlencode(ucwords($_GET["city"]))."&APPID=".getenv('WHATS_THE_WEATHER_API_KEY');
+      $encodedCity = urlencode(ucwords($_GET["city"]));
+      $WHATS_THE_WEATHER_API_KEY = getenv("WHATS_THE_WEATHER_API_KEY");
+      //echo str_replace('"', ' ', $WHATS_THE_WEATHER_API_KEY);
+      $url = 'http://api.openweathermap.org/data/2.5/weather?q='.$encodedCity.'&APPID='.str_replace('"', '', $WHATS_THE_WEATHER_API_KEY).'';
+
       $url_headers = @get_headers($url);
 
       if (!$url_headers || $url_headers[0] == 'HTTP/1.1 404 Not Found') {
@@ -127,9 +130,11 @@
             <input type="text" class="form-control" name="city" id="city" placeholder="E.g. London, Paris, Istanbul...">
           </div>
             <div id="result">
-              <h2><strong>Weather for: </strong><?php echo ucwords($_GET["city"]); ?></h2>
+              <h2><strong>Weather for: </strong><?php if (array_key_exists("city", $_GET)) { echo ucwords($_GET["city"]); } ?></h2>
               <?php
-                echo $weatherForecast;
+                if (isset($weatherForecast)) {
+                  echo $weatherForecast;
+                }
               ?>
             </div>
             <div class="form-group">

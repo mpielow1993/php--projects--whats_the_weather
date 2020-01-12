@@ -15,9 +15,7 @@
 
       $url_headers = @get_headers($url);
 
-      if (!$url_headers || $url_headers[0] == 'HTTP/1.1 404 Not Found') {
-          $weatherForecast = '<div class="alert alert-danger">Not Found</div>';
-      } else {
+      if ($url_headers[0] == 'HTTP/1.1 200 OK') {
           $urlContents = file_get_contents($url);
           //Converts JSON to an array in PHP
           //2nd argument set to 'true' will return the data as an associative array
@@ -27,20 +25,22 @@
           //print_r($weatherArray);
 
           $attributes = array(
-          "weatherDescription" => ucfirst($weatherArray["weather"][0]["description"]).".",
-          //echo $weatherDescription;
-          "tempInCelsius" => ((float)ucfirst($weatherArray["main"]["temp"]) - 273.15)."&deg;C.",
-          //echo $tempInCelsius;
+        "weatherDescription" => ucfirst($weatherArray["weather"][0]["description"]).".",
+        //echo $weatherDescription;
+        "tempInCelsius" => ((float)ucfirst($weatherArray["main"]["temp"]) - 273.15)."&deg;C.",
+        //echo $tempInCelsius;
 
-          "windSpeed" => ((float)$weatherArray["wind"]["speed"])."m&#47;s."
-          //echo $windSpeed;
-        );
+        "windSpeed" => ((float)$weatherArray["wind"]["speed"])."m&#47;s."
+        //echo $windSpeed;
+      );
 
           $weatherForecast = "";
           foreach ($attributes as $key => $value) {
               $weatherForecast .= "<p><strong>".ucwords(preg_replace('/[A-Z]/', " $0", $key)).":&nbsp</strong>".$value."</p>";
           }
           $weatherForecast = '<div class="alert alert-success">'.$weatherForecast.'</div>';
+      } else {
+          $weatherForecast = '<div class="alert alert-danger">Not Found</div>';
       }
   }
 
@@ -130,10 +130,12 @@
             <input type="text" class="form-control" name="city" id="city" placeholder="E.g. London, Paris, Istanbul...">
           </div>
             <div id="result">
-              <h2><strong>Weather for: </strong><?php if (array_key_exists("city", $_GET)) { echo ucwords($_GET["city"]); } ?></h2>
+              <h2><strong>Weather for: </strong><?php if (array_key_exists("city", $_GET)) {
+    echo ucwords($_GET["city"]);
+} ?></h2>
               <?php
                 if (isset($weatherForecast)) {
-                  echo $weatherForecast;
+                    echo $weatherForecast;
                 }
               ?>
             </div>
